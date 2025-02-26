@@ -13,7 +13,7 @@ const loadMoreBtn = document.querySelector('.load-more-btn');
 
 let saveQuery = '';
 let refreshPage;
-let perPage;
+// let perPage;
 let currentPage = 1;
 let totalHits;
 
@@ -45,7 +45,6 @@ async function onSearch(evt) {
 
         gallery.insertAdjacentHTML("beforeend", createMarkup(resp.data.hits));
         totalHits = resp.data.totalHits;
-        console.log(totalHits);
         
 
         if (!resp.data.hits.length) {
@@ -66,7 +65,7 @@ async function onSearch(evt) {
             captionDelay: 250,
         });
         refreshPage.refresh();
-        checkBtnStatus();
+        // checkBtnStatus();
     } catch (err) {
 
         loader.style.display = 'none';
