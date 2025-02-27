@@ -40,6 +40,7 @@ async function onSearch(evt) {
             message: 'Please enter search text!',
         }),
             loader.style.display = 'none',
+            hideLoadMoreBtn(),
             form.reset()
     }
 
@@ -56,6 +57,7 @@ async function onSearch(evt) {
                 message: 'Sorry, there are no images matching your search query. Please try again!',
             }),
                 loader.style.display = 'none';
+            hideLoadMoreBtn();
             form.reset();
             return;
         }
