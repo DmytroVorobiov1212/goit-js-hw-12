@@ -86,9 +86,13 @@ button {
     transition: background 0.3s;
 }
 
-/* .load-more-btn:hover {
-    background-color: #0056b3;
+/* .load-more-btn_text{
+    padding-right: 10px;
 } */
+
+.load-more-btn:hover {
+    background-color: #0056b3;
+}
 
 /* .load-more-btn_text{} */
 

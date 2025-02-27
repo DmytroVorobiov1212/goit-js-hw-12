@@ -5,12 +5,12 @@ import axios from "axios";
 const KEY = '45785559-b0577f06fb94f4ced9a4d3280';
 const BASE_URL = 'https://pixabay.com/api/';
 
-export function getSearch(searchText, currentPage) {
+export async function getSearch(searchText, currentPage, perPage) {
     try {
 
         searchText = searchText.replace(/\s+/g, '+');
 
-        const response = axios.get(`${BASE_URL}`, {
+        const response = await axios.get(`${BASE_URL}`, {
             params: {
                 key: KEY,
                 q: searchText,
@@ -18,14 +18,16 @@ export function getSearch(searchText, currentPage) {
                 orientation: 'horizontal',
                 safesearch: true,
                 page: currentPage,
-                per_page: 5,
+                per_page: perPage,
             }
         })
-        return response;
+        return response.data;
     } catch (error) {
         iziToast.error({
             title: 'Error',
             message: 'Sorry! The site is currently unavailable. Please try later!',
         });
+
+        throw error;
     }
 }

@@ -10,14 +10,18 @@ const form = document.querySelector('.js-form');
 const gallery = document.querySelector('.js-gallery');
 const loader = document.querySelector('.loader');
 const loadMoreBtn = document.querySelector('.load-more-btn');
+const loadMoreBtnText = document.querySelector('.load-more-btn_text');
+const loadBtnSpinner = document.querySelector('.loader-btn')
 
 let saveQuery = '';
 let refreshPage;
-// let perPage;
-let currentPage = 1;
+const perPage = 40;
+let currentPage;
 let totalHits;
 
 loader.style.display = 'none';
+
+// ==== Listener and function search images form;
 
 form.addEventListener('submit', onSearch);
 
@@ -31,7 +35,7 @@ async function onSearch(evt) {
     currentPage = 1;
 
     if (saveQuery === '') {
-        return iziToast.info({
+        return iziToast.warning({
             title: 'Hello',
             message: 'Please enter search text!',
         }),
@@ -41,13 +45,12 @@ async function onSearch(evt) {
 
 
     try {
-        const resp = await getSearch(saveQuery, currentPage)
+        const resp = await getSearch(saveQuery, currentPage, perPage)
 
-        gallery.insertAdjacentHTML("beforeend", createMarkup(resp.data.hits));
-        totalHits = resp.data.totalHits;
-        
+        gallery.insertAdjacentHTML("beforeend", createMarkup(resp.hits));
+        totalHits = resp.totalHits;
 
-        if (!resp.data.hits.length) {
+        if (!resp.hits.length) {
             iziToast.error({
                 title: 'Error',
                 message: 'Sorry, there are no images matching your search query. Please try again!',
@@ -65,29 +68,33 @@ async function onSearch(evt) {
             captionDelay: 250,
         });
         refreshPage.refresh();
-        // checkBtnStatus();
+
+        checkBtnStatus();
     } catch (err) {
 
         loader.style.display = 'none';
-
-        iziToast.error({
-            title: 'Error',
-            message: 'Something went wrong. Please try again later!',
-        });
 
     };
     form.reset();
 }
 
+// ==== Listener and function Button Load More;
+
 loadMoreBtn.addEventListener('click', loadBtnSearch);
 
 async function loadBtnSearch() {
     currentPage += 1;
+    checkBtnStatus();
+    showBtnSpinner();
 
-    const resp = await getSearch(saveQuery, currentPage)
+    const resp = await getSearch(saveQuery, currentPage, perPage)
 
-    gallery.insertAdjacentHTML("beforeend", createMarkup(resp.data.hits));
+    gallery.insertAdjacentHTML("beforeend", createMarkup(resp.hits));
+    hideBtnSpinner();
+    scrollNextPage();
 }
+
+// ==== functions show and hide Button Load More;
 
 function showLoadMoreBtn() {
     loadMoreBtn.classList.remove('hidden');
@@ -102,7 +109,67 @@ function checkBtnStatus() {
 
     if (currentPage >= maxPage) {
         hideLoadMoreBtn();
+        iziToast.info({
+            title: 'Hello',
+            message: 'You have viewed all the images.',
+            position: 'topRight',
+        });
     } else {
         showLoadMoreBtn();
     }
+}
+
+// ==== functions show and hide button Load More Spinner;
+
+function showBtnSpinner() {
+    loadBtnSpinner.classList.remove('hidden');
+    loadMoreBtnText.classList.add('hidden');
+}
+
+function hideBtnSpinner() {
+    loadBtnSpinner.classList.add('hidden');
+    loadMoreBtnText.classList.remove('hidden');
+}
+
+// ==== function Button scroll top;
+
+function scrollingTopPage() {
+    document.addEventListener('DOMContentLoaded', function () {
+        const upButton = document.querySelector('.up-btn');
+
+        upButton.addEventListener('click', function () {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+
+            document.body.classList.add('scrolling');
+        });
+
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 200) {
+                upButton.classList.add('show');
+            } else {
+                upButton.classList.remove('show');
+            }
+
+            if (document.body.classList.contains('scrolling') && window.scrollY === 0) {
+                document.body.classList.remove('scrolling');
+            }
+        });
+    });
+}
+
+scrollingTopPage();
+
+// ==== function smooth scroll next page;
+
+function scrollNextPage() {
+    const infoCard = gallery.firstElementChild.getBoundingClientRect();
+    const heightCard = infoCard.height * 2;
+
+    scrollBy({
+        behavior: 'smooth',
+        top: heightCard,
+    });
 }
